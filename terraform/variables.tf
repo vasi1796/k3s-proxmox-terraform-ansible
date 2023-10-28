@@ -46,7 +46,7 @@ variable "num_k3s_nodes_mem" {
   default = "4096"
 }
 
-variable "tamplate_vm_name" {}
+variable "template_vm_name" {}
 
 variable "master_ips" {
   description = "List of ip addresses for master nodes"
@@ -61,5 +61,5 @@ variable "networkrange" {
 }
 
 variable "gateway" {
-  default = "192.168.3.1"
+  default = "192.168.1.1"
 }

@@ -8,9 +8,6 @@ This is based on the great work that <https://github.com/itwars> done with Ansib
 * Terraform installed
 * Proxmox server
 
-## How to
-for updated documentation check out my [medium](https://medium.com/@ssnetanel/build-a-kubernetes-cluster-using-k3s-on-proxmox-via-ansible-and-terraform-c97c7974d4a5).
-
 ### Proxmox setup
 
 This setup is relaying on cloud-init images.
@@ -55,40 +52,46 @@ so now we should have the image configured and on our Proxmox server. let's star
 qm create 9000 --name "ubuntu-focal-cloudinit-template" --memory 2048 --net0 virtio,bridge=vmbr0
 ```
 
-for ubuntu images, rename the image suffix
+For ubuntu images, rename the image suffix
 
 ```bash
 mv focal-server-cloudimg-amd64.img focal-server-cloudimg-amd64.qcow2
 ```
 
-import the disk to the VM
+Import the disk to the VM
 
 ```bash
 qm importdisk 9000 focal-server-cloudimg-amd64.qcow2 local-lvm
 ```
 
-configure the VM to use the new image
+Configure the VM to use the new image
 
 ```bash
 qm set 9000 --scsihw virtio-scsi-pci --scsi0 local-lvm:vm-9000-disk-0
 ```
 
-add cloud-init image to the VM
+Add cloud-init image to the VM
 
 ```bash
 qm set 9000 --ide2 local-lvm:cloudinit
 ```
 
-set the VM to boot from the cloud-init disk:
+Set the VM to boot from the cloud-init disk:
 
 ```bash
 qm set 9000 --boot c --bootdisk scsi0
 ```
 
-update the serial on the VM
+Update the serial on the VM
 
 ```bash
 qm set 9000 --serial0 socket --vga serial0
+```
+
+Enable the agent
+
+```bash
+qm set 9000 --agent enabled=1
 ```
 
 Good! so we are almost done with the image. now we can configure our base configuration for the image.
@@ -96,7 +99,7 @@ you can connect to the Proxmox server and go to your VM and look on the cloud-in
 
 ![alt text](pics/gui-cloudinit-config.png)
 
-you will need to change the user name, password, and add the ssh public key so we can connect to the VM later using Ansible and terraform.
+You will need to change the user name, password, and add the ssh public key so we can connect to the VM later using Ansible and terraform.
 update the variables and click on `Regenerate Image`
 
 Great! so now we can convert the VM to a template and start working with terraform.
@@ -105,9 +108,9 @@ Great! so now we can convert the VM to a template and start working with terrafo
 qm template 9000
 ```
 
-### terraform setup
+### Terraform setup
 
-our terraform file also creates a dynamic host file for Ansible, so we need to create the files first
+Our terraform file also creates a dynamic host file for Ansible, so we need to create the files first
 
 ```bash
 cp -R inventory/sample inventory/my-cluster
@@ -178,9 +181,3 @@ To get argocd initial password run the following:
 ```
 kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d; echo
 ```
-
-## Enjoy!
-
-Kubernets is realy fun to learn and there is so muche things that you can automate.
-
-Have fun :)

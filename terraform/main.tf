@@ -56,10 +56,10 @@ data "template_file" "k8s" {
 
 resource "local_file" "k8s_file" {
   content  = data.template_file.k8s.rendered
-  filename = "../inventory/my-cluster/hosts.ini"
+  filename = "../ansible/k3s/inventory/my-cluster/hosts.ini"
 }
 
 resource "local_file" "var_file" {
-  source   = "../inventory/sample/group_vars/all.yml"
-  filename = "../inventory/my-cluster/group_vars/all.yml"
+  source   = "../ansible/inventory/sample/group_vars/all.yml"
+  filename = "../ansible/inventory/my-cluster/group_vars/all.yml"
 }

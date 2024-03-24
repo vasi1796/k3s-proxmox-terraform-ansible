@@ -31,10 +31,10 @@ data "template_file" "debian_vms" {
 
 resource "local_file" "debian_vms_file" {
   content  = data.template_file.debian_vms.rendered
-  filename = "../inventory/deb-vms/hosts.ini"
+  filename = "../ansible/debian/inventory/deb-vms/hosts.ini"
 }
 
 resource "local_file" "var_file" {
-  source   = "../inventory/sample/group_vars/all.yml"
-  filename = "../inventory/deb-vms/group_vars/all.yml"
+  source   = "../ansible/debian/inventory/sample/group_vars/all.yml"
+  filename = "../ansible/debian/inventory/deb-vms/group_vars/all.yml"
 }

@@ -7,7 +7,9 @@ resource "proxmox_vm_qemu" "proxmox_debian_server" {
   agent       = 1
   scsihw      = "virtio-scsi-pci"
   memory      = var.num_servers_mem
-  cores       = 1
+  cpu {
+    cores = 1
+  }
 
   ipconfig0 = "ip=${var.server_ips[count.index]}/${var.networkrange},gw=${var.gateway}"
 
@@ -22,15 +24,10 @@ resource "proxmox_vm_qemu" "proxmox_debian_server" {
 
 }
 
-data "template_file" "debian_vms" {
-  template = file("./templates/debian_vms.tpl")
-  vars = {
-    debian_ip = "${join("\n", [for instance in proxmox_vm_qemu.proxmox_debian_server : join("", [instance.default_ipv4_address, " ansible_ssh_private_key_file=", var.pvt_key])])}"
-  }
-}
-
 resource "local_file" "debian_vms_file" {
-  content  = data.template_file.debian_vms.rendered
+  content = templatefile("./templates/debian_vms.tpl", {
+    debian_ip = join("\n", [for instance in proxmox_vm_qemu.proxmox_debian_server : join("", [instance.default_ipv4_address, " ansible_ssh_private_key_file=", var.pvt_key])])
+  })
   filename = "../ansible/debian/inventory/deb-vms/hosts.ini"
 }
 
